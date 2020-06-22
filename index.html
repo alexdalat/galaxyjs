@@ -29,9 +29,9 @@
 	<canvas id="canvas2" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
 
 	<div style="position:absolute; padding-left: 20px; top: 20px; z-index:2; color: #ccc" class="slidecontainer">
-		<label style="margin-top: -4px; padding-right: 10px" for="scaleSlider">Scale</label>
-		<input type="range" min="1" max="50" value="1" step=0.5 id="scaleSlider" oninput="updateScale(this.value)" />
-		<span style="padding-left: 10px" id="scaleConsole"></span>
+		<label style="margin-top: -4px; padding-right: 10px" for="countSlider">Particles</label>
+		<input type="range" min="1" max="2000" value="200" step=1 id="countSlider" oninput="updateCount(this.value)" />
+		<span style="padding-left: 10px" id="countConsole"></span>
 	</div>
 	<div style="position:absolute; padding-left: 20px; top: 60px; z-index:2; color: #ccc" class="slidecontainer">
 		<label style="margin-top: -4px; padding-right: 10px" for="iterationSlider">Iterations</label>
@@ -43,8 +43,13 @@
 		<input type="range" min="0" max="0.1" value="0.02" step=0.001 id="stepSlider" oninput="updateStep(this.value)" />
 		<span style="padding-left: 10px" id="stepConsole"></span>
 	</div>
-	<div style="position:absolute; padding-left: 20px; top: 140px; z-index:2; color: #ccc" class="trackcontainer">
-		<label style="margin-top: -4px; padding-right: 10px" for="cameraTrackSlider">Camera Track</label>
-		<input type="checkbox" id="cameraTrackSlider" oninput="updateCameraTrack(this.checked)" />
+	<div style="position:absolute; padding-left: 20px; top: 140px; z-index:2; color: #ccc" class="slidecontainer">
+		<label style="margin-top: -4px; padding-right: 10px" for="scaleSlider">Scale</label>
+		<input type="range" min="0.1" max="50" value="1" step=0.1 id="scaleSlider" oninput="updateScale(this.value)" />
+		<span style="padding-left: 10px" id="scaleConsole"></span>
+	</div>
+	<div style="position:absolute; padding-left: 20px; top: 180px; z-index:2; color: #ccc">
+		<label style="margin-top: -4px; padding-right: 10px" for="trailSlider">Trail</label>
+		<input type="checkbox" id="trailSlider" checked oninput="updateTrail(this.checked)" />
 	</div>
 </body>

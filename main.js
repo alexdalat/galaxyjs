@@ -17,9 +17,10 @@ var camera;
 var bodies;
 var canvasCenter;
 
+var start_particle_count = 200;
 var thread_count = 100;
 var positions = [[]]; // trail effect
-var killDist = 800;
+var killDist = canvas.width/2;
 const G = 0.4;
 
 var workers = [];
@@ -28,6 +29,7 @@ var worker_data = {
 	positions: []
 };
 var thread_completion = 0;
+var ignore_next_workers = false;
 
 function init() {
 	camera = {
@@ -35,15 +37,37 @@ function init() {
 		scale: document.getElementById("scaleSlider").value
 	}
 
-	bodies = [ ]
+	config = {
+		fancy_trails: false,
+		fancy_trail_length: 10,
+		fancy_trail_opacity: 0.3,
+
+		lag_friendly_trail: document.getElementById("trailSlider").checked,
+		lag_friendly_trail_opacity: 0.5, //  < 0.5 leaves faint perma-trail
+
+		debug_trails: false,
+		debug_only_first_trail: false,
+	}
+
+	canvasCenter = new vec2(canvas.width/2, canvas.height/2)
+	ctx.rect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "rgba(25, 29, 30, 1)"
+	ctx.fill();
+	ui();
+	createWorkers();
+
+	tick();
+}
+function createBodies(num) {
+	bodies = []
 
 	maxRadius = 600;
 	maxSpeed = 300000
-	let total = 200000;
+	let total = num;
 
 	let ostep = (maxRadius-50) / total
 	let o = 50;
-	for(let p = 1; p < total+1; p++) {
+	for(let p = 0; p < total; p++) {
 		let rand = randi(0, 360)
 		let theta = radians(rand);
 		let vtheta = radians(rand + 90)
@@ -54,7 +78,7 @@ function init() {
 			new Body(
 				new vec2(orbit*Math.cos(theta), orbit*Math.sin(theta)),
 				new vec2(s*Math.cos(vtheta), s*Math.sin(vtheta)),
-				0.01, 1
+				0.01, 2
 			),
 		)
 		o += ostep;
@@ -69,32 +93,6 @@ function init() {
 			false
 		)
 	)
-
-	config = {
-		fancy_trails: false,
-		fancy_trail_length: 10,
-		fancy_trail_opacity: 0.3,
-
-		lag_friendly_trail: false,
-		lag_friendly_trail_opacity: 0.5, //  < 0.5 leaves faint perma-trail
-
-		debug_trails: false,
-		debug_only_first_trail: false,
-	
-		// camera
-		camera_track: document.getElementById("cameraTrackSlider").checked,
-	}
-
-	canvasCenter = new vec2(canvas.width/2, canvas.height/2)
-
-	ctx.rect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "rgba(25, 29, 30, 1)"
-	ctx.fill();
-
-	ui();
-	createWorkers();
-
-	tick();
 }
 
 var lastTick = performance.now()
@@ -107,9 +105,7 @@ function tick() {
 	// clear canvas
 	//ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.rect(0, 0, canvas.width, canvas.height);
-	if(config.lag_friendly_trail) ctx.fillStyle = "rgba(25, 29, 30, "+config.lag_friendly_trail_opacity+")"
-	else ctx.fillStyle = "rgb(25, 29, 30)"
-	ctx.fill();
+	clearCanvas();
 
 	var lb = largestBody(bodies);
 	let thread_step = Math.ceil(bodies.length / thread_count);
@@ -130,7 +126,7 @@ function tick() {
 		}) );
 	}
 	if(config.camera_track) {
-		//camera.pos.x = lerp(camera.pos.x, lb.pos.x*camera.scale, 1)
+		camera.pos.x = lerp(camera.pos.x, lb.pos.x*camera.scale, 1)
 	}
 
 }
@@ -162,12 +158,10 @@ function draw() {
 		circle(drawPos, body.r*camera.scale, rgbToString(newColor));
 		ctx.shadowBlur = 0;
 
-
-
 		if(config.debug_trails && !config.debug_only_first_trail || (config.debug_only_first_trail && i === 0)) {
 			let drawPosTemp = canvasCenter.sub(camera.pos.sub(body.pos.scale(camera.scale)))
 			ctx2.lineTo(drawPosTemp.x, drawPosTemp.y)
-			ctx2.strokeStyle = rgbToString(body.color)
+			ctx2.strokeStyle = rgbToString(newColor)
 			ctx2.stroke()
 		}
 	}
@@ -184,9 +178,11 @@ function createWorkers() {
 			thread_completion++;
 			if(thread_completion >= workers.length) {
 				thread_completion = 0;
-				bodies = worker_data.bodies
+				if(!ignore_next_workers) {
+					bodies = worker_data.bodies
+					positions = worker_data.positions
+				} else ignore_next_workers = false;
 				worker_data.bodies = [];
-				positions = worker_data.positions
 				worker_data.positions = [];
 				draw();
 			}
@@ -195,6 +191,7 @@ function createWorkers() {
 }
 
 function updateScale(value) {
+	clearCanvas()
 	camera.scale = Math.sqrt(value);
 	document.getElementById("scaleConsole").innerHTML = round(camera.scale, 2);
 
@@ -208,15 +205,29 @@ function updateStep(value) {
 	time_step = round(Math.pow(value, 2), 6);
 	document.getElementById("stepConsole").innerHTML = value;
 }
-function updateCameraTrack(value) {
-	config.camera_track = value;
+function updateCount(value) {
+	clearCanvas()
+	createBodies(value);
+	ignore_next_workers = true;
+	document.getElementById("countConsole").innerHTML = value;
+}
+function updateTrail(value) {
+	config.lag_friendly_trail = value;
+	clearCanvas()
 }
 
 function ui() {
+	updateCount(start_particle_count);
 	updateScale(document.getElementById("scaleSlider").value);
 	updateStep(document.getElementById("stepSlider").value)
 	updateIteration(document.getElementById("iterationSlider").value)
-	updateCameraTrack(document.getElementById("cameraTrackSlider").value);
+	updateTrail(document.getElementById("trailSlider").value);
+}
+
+function clearCanvas() {
+	if(config.lag_friendly_trail) ctx.fillStyle = "rgba(25, 29, 30, "+config.lag_friendly_trail_opacity+")"
+	else ctx.fillStyle = "rgb(25, 29, 30)"
+	ctx.fill();
 }
 
 var classes = [vec2, Body];
