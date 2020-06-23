@@ -17,7 +17,6 @@ var camera;
 var bodies;
 var canvasCenter;
 
-var start_particle_count = 100;
 var thread_count = 10;
 var killDist = canvas.width/2;
 const G = 1;
@@ -38,15 +37,15 @@ function init() {
 	config = {
 		// NOTE: all nulls are defined in ui()
 
+		rainbow: null,
+
 		lag_friendly_trail: null,
 		lag_friendly_trail_opacity: 0.5, //  < 0.5 leaves faint perma-trail
 
 		debug_trails: null,
 		debug_only_first_trail: false,
 
-		rainbow: null,
 	}
-	console.log(config)
 
 	canvasCenter = new vec2(canvas.width/2, canvas.height/2)
 	clearCanvas();
@@ -58,7 +57,7 @@ function createBodies(num) {
 	bodies = []
 
 	maxRadius = 600;
-	maxSpeed = 300000
+	maxSpeed = 350000
 	let total = num;
 
 	let ostep = (maxRadius-50) / total
@@ -75,7 +74,7 @@ function createBodies(num) {
 				new vec2(orbit*Math.cos(theta), orbit*Math.sin(theta)),
 				new vec2(s*Math.cos(vtheta), s*Math.sin(vtheta)),
 				0.01, 2
-			),
+			)
 		)
 		o += ostep;
 	}
@@ -124,6 +123,8 @@ function tick() {
 function draw() {
 	requestAnimationFrame(tick);
 
+	document.getElementById("remainingConsole").innerHTML = bodies.length;
+
 	var now = performance.now()
 	var deltaTime = now - lastTick
 	lastTick = now
@@ -134,7 +135,11 @@ function draw() {
 		var body = bodies[i]
 
 		var drawPos = body.getScreenPos(body.pos)
-		var newColor = (config.rainbow) ? body.color : getDistColor(body);
+		var newColor;
+		if(config.rainbow) {
+			newColor = getDistBodyColor(body)
+		} else 
+			newColor = getDistColor(body);
 		if(body === lb) newColor = body.color;
 
 		ctx.shadowBlur = ((body !== lb) ? 10 : 30)*camera.scale;
@@ -211,7 +216,7 @@ function updateDebugTrail(value) {
 }
 
 function ui() {
-	updateCount(start_particle_count);
+	updateCount(document.getElementById("countSlider").value);
 	//updateScale(document.getElementById("scaleSlider").value);
 	updateStep(document.getElementById("stepSlider").value)
 	updateIteration(document.getElementById("iterationSlider").value)
