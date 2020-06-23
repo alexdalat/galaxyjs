@@ -1,10 +1,9 @@
 function calc() {
-
 	for(let i = 0; i < bodies.length; i++) {
 		var body = bodies[i]
 
+		body.oldpos = clone(body.pos)
 		for(let s = 0; s < speed; s++) {
-
 			if(body.moveable) {
 				body.tick(lb, time_step)
 
@@ -13,13 +12,7 @@ function calc() {
 				}
 			}
 		}
-
-		if(config.fancy_trails) {
-			if(positions[i] === undefined) positions.push([])
-			storeLastPosition(positions[i], body.pos);
-		}
 	}
-	return bodies;
 }
 
 self.importScripts("util.js");
@@ -40,11 +33,10 @@ self.addEventListener('message', function(o) {
 	canvasCenter = e.canvasCenter
 	killDist = e.killDist
 	camera = e.camera
-	positions = e.positions
 	maxRadius = e.maxRadius
 
 
-	bodies = calc();
+	calc();
 	self.postMessage(JSON.stringify({bodies: bodies}))
 }, false)
 

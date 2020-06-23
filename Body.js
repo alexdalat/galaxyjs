@@ -1,6 +1,6 @@
 class Body {
 	static __type__ = this.name;
-	constructor(pos, vel, mass, radius, color, moveable) {
+	constructor(pos, vel, mass, radius, color, moveable, oldpos) {
 		this.__type__ = Body.__type__;
 		
 		this.pos = pos
@@ -9,18 +9,19 @@ class Body {
 		if(radius == 0)this.r = Math.sqrt(G*mass) / 50
 		else this.r = radius
 
-		if(color === undefined) color = HSVtoRGB(Math.random()*360, 100, 70)
+		if(color === undefined) color = HSVtoRGB(Math.random()*360, 100, 100)
 		this.color = color
 		if(moveable === undefined) moveable = true
 		this.moveable = moveable
+
+		this.oldpos = oldpos
 	}
 	tick(other_body, dt) {
 		var a0 = this.getAcceleration(other_body)
 		this.velocity = this.velocity.add(a0.scale(0.5 * dt))
 		this.pos = this.pos.add(this.velocity.scale(dt))
-
+		
 		var a1 = this.getAcceleration(other_body)
-
 		this.velocity = this.velocity.add(a1.scale(0.5 * dt))
 	}
 	getAcceleration(other_body) {
@@ -41,6 +42,9 @@ class Body {
 	collisionCheck(other_body, scale) { // https://stackoverflow.com/questions/1736734/circle-circle-collision
 		if( ((this.pos.distance(other_body.pos)*scale) <= ((this.r*scale+other_body.r*scale)^2)) ) return true;
 		else return false;
+	}
+	getScreenPos(npos) {
+		return canvasCenter.sub(camera.pos.sub(npos.scale(camera.scale)))
 	}
 
 	getG() {

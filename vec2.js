@@ -26,6 +26,12 @@ class vec2 {
 	distanceSquared(v2) {
 		return Math.pow(v2.x - this.x, 2) + Math.pow(v2.y - this.y, 2)
 	}
+	equal(v2) {
+		return (this.x === v2.x && this.y === v2.y)
+	}
+	set(v2) {
+		this.x = v2.x; this.y = v2.y;
+	}
 
 
 	static add(v1, v2) {

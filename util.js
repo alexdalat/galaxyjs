@@ -13,17 +13,9 @@ function largestBody(array) {
 		return (prev.mass > current.mass) ? prev : current
 	})
 }
-
-function storeLastPosition(arr, xy) {
-	// push an item
-	arr.push(xy);
-   
-	//get rid of first item
-	if (arr.length > config.fancy_trail_length) {
-		arr.shift();
-	}
-  }
-
+function clone(obj) {
+    return Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+}
 function rgbToString(rgb) {
 	if(rgb.r === undefined)
 		return "rgb("+rgb[0]+", "+rgb[1]+", "+rgb[2]+")"
