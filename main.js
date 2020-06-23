@@ -37,7 +37,9 @@ function init() {
 	config = {
 		// NOTE: all nulls are defined in ui()
 
+		particle_count: null,
 		rainbow: null,
+		spirals: null,
 
 		lag_friendly_trail: null,
 		lag_friendly_trail_opacity: 0.5, //  < 0.5 leaves faint perma-trail
@@ -55,30 +57,6 @@ function init() {
 }
 function createBodies(num) {
 	bodies = []
-
-	maxRadius = 600;
-	maxSpeed = 350000
-	let total = num;
-
-	let ostep = (maxRadius-50) / total
-	let o = 50;
-	for(let p = 0; p < total; p++) {
-		let rand = randi(0, 360)
-		let theta = radians(rand);
-		let vtheta = radians(rand + 90)
-
-		let orbit = randi(50, o)
-		let s = randi(maxSpeed/2, maxSpeed) / orbit
-		bodies.push(
-			new Body(
-				new vec2(orbit*Math.cos(theta), orbit*Math.sin(theta)),
-				new vec2(s*Math.cos(vtheta), s*Math.sin(vtheta)),
-				0.01, 2
-			)
-		)
-		o += ostep;
-	}
-
 	bodies.push(
 		new Body(
 			new vec2(0, 0),
@@ -89,6 +67,60 @@ function createBodies(num) {
 			new vec2(0, 0)
 		)
 	)
+
+	var lb = bodies[0];
+	let waveMaxRadius = 50;
+	let maxRadius = 400;
+	let minRadius = 54;
+	let total = config.particle_count;
+
+	if(config.spirals) {
+		let wave_count = 4
+		let wavetotal = total*(0.3) / wave_count
+		let waveJitter = 10 // rand(-jtr, jtr)
+		for(let s = 0; s < wave_count; s++) {
+			for(let p = 0; p < wavetotal; p++) {
+				let jitter = radians(randf(-waveJitter, waveJitter))
+				let theta = radians(p/wavetotal*360 + 360/wave_count*s) + jitter;
+				let vtheta = radians(p/wavetotal*360 + 90 + 360/wave_count*s) + jitter
+
+				let wtheta = radians(p/wavetotal*360)
+				let orbit = Math.pow(Math.E, 0.30635*(wtheta)) * (waveMaxRadius) + minRadius
+
+				bodies.push(
+					new Body(
+						new vec2(orbit*Math.cos(theta), orbit*Math.sin(theta)),
+						new vec2(0, 0),
+						0.01, 2
+					)
+				)
+				let body = bodies[bodies.length-1]
+				let speed = body.orbitVel(lb)
+				body.velocity = new vec2(speed*Math.cos(vtheta), speed*Math.sin(vtheta));
+			}
+		}
+	}
+
+	let maxSpeed = 350000
+	let scattertotal = (config.spirals)?total*(0.7) : total
+	let ostep = (maxRadius-minRadius) / scattertotal
+	let o = minRadius;
+	for(let p = 0; p < scattertotal; p++) {
+		let rand = randi(0, 360)
+		let theta = radians(rand);
+		let vtheta = radians(rand + 90)
+
+		let orbit = randi(50, o)
+		let s = randi(maxSpeed*(0.5), maxSpeed) / orbit
+		bodies.push(
+			new Body(
+				new vec2(orbit*Math.cos(theta), orbit*Math.sin(theta)),
+				new vec2(s*Math.cos(vtheta), s*Math.sin(vtheta)),
+				0.01, 2
+			)
+		)
+		o += ostep;
+	}
 }
 
 var lastTick = performance.now()
@@ -113,7 +145,6 @@ function tick() {
 			canvasCenter: canvasCenter,
 			killDist: killDist,
 			camera: camera,
-			maxRadius: maxRadius
 		}) );
 	}
 	if(config.camera_track) {
@@ -197,7 +228,8 @@ function updateStep(value) {
 function updateCount(value) {
 	clearCanvas()
 	clearCanvas2()
-	createBodies(value);
+	config.particle_count = value;
+	createBodies();
 	ignore_next_workers = true;
 	document.getElementById("countConsole").innerHTML = value;
 }
@@ -209,6 +241,13 @@ function updateRainbow(value) {
 	config.rainbow = value;
 	clearCanvas()
 	clearCanvas2()
+}
+function updateSpiral(value) {
+	config.spirals = value;
+	clearCanvas()
+	clearCanvas2()
+	createBodies();
+	ignore_next_workers = true;
 }
 function updateDebugTrail(value) {
 	config.debug_trails = value;
@@ -224,6 +263,7 @@ function ui() {
 	updateTrail(document.getElementById("trailCheck").checked);
 	updateDebugTrail(document.getElementById("debugTrailCheck").checked);
 	updateRainbow(document.getElementById("rainbowCheck").checked);
+	updateSpiral(document.getElementById("spiralCheck").checked);
 }
 
 function clearCanvas() {

@@ -45,6 +45,9 @@ class Body {
 	getScreenPos(npos) {
 		return canvasCenter.sub(camera.pos.sub(npos.scale(camera.scale)))
 	}
+	orbitVel(nbody) { // https://en.wikipedia.org/wiki/Orbital_speed
+		return Math.sqrt((G*nbody.mass)*(1/this.pos.dist(nbody.pos)))
+	}
 
 	getG() {
 		return (G * this.mass) / Math.pow(this.r, 2);

@@ -33,7 +33,6 @@ self.addEventListener('message', function(o) {
 	canvasCenter = e.canvasCenter
 	killDist = e.killDist
 	camera = e.camera
-	maxRadius = e.maxRadius
 
 
 	calc();

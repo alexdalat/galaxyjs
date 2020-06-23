@@ -30,7 +30,7 @@
 
 	<div style="position:absolute; padding-left: 20px; top: 20px; z-index:2; color: #ccc" class="slidecontainer">
 		<label style="margin-top: -4px; padding-right: 10px" for="countSlider">Particles</label>
-		<input type="range" min="1" max="5000" value="1000" step=10 id="countSlider" oninput="updateCount(this.value)" />
+		<input type="range" min="1" max="10000" value="1000" step=10 id="countSlider" oninput="updateCount(this.value)" />
 		<span style="padding-left: 10px" id="countConsole"></span>
 	</div>
 	<div style="position:absolute; padding-left: 20px; top: 60px; z-index:2; color: #ccc" class="slidecontainer">
@@ -59,6 +59,10 @@
 	<div style="position:absolute; margin-left: 20px; top: 180px; z-index:2; color: #ccc">
 		<input type="checkbox" id="rainbowCheck" oninput="updateRainbow(this.checked)" />
 		<label style="padding-right: 10px" for="rainbowCheck">RAINBOWZ</label>
+	</div>
+	<div style="position:absolute; margin-left: 20px; top: 220px; z-index:2; color: #ccc">
+		<input type="checkbox" id="spiralCheck" oninput="updateSpiral(this.checked)" />
+		<label style="padding-right: 10px" for="spiralCheck">Spirals</label>
 	</div>
 
 

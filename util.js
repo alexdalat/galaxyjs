@@ -5,12 +5,12 @@ function circle(xy, r, color) {
 	ctx.fill();
 }
 function getDistColor(body) {
-	var dist = body.pos.distance(largestBody(bodies).pos) / (maxRadius - largestBody(bodies).r) * 100
+	var dist = body.pos.distance(largestBody(bodies).pos) / (canvasCenter.y - largestBody(bodies).r) * 100
 	return HSVtoRGB(240, dist, 150-dist)
 }
 function getDistBodyColor(body) {
 	var newColor = RGBtoHSV(body.color[0], body.color[1], body.color[2])
-	var dist = body.pos.distance(largestBody(bodies).pos) / (maxRadius - largestBody(bodies).r) * 100
+	var dist = body.pos.distance(largestBody(bodies).pos) / (canvasCenter.y - largestBody(bodies).r) * 100
 	newColor.v = 100 - dist
 	return HSVtoRGB(newColor.h, newColor.s, newColor.v)
 }
@@ -134,6 +134,9 @@ function RGBtoHSV (r, g, b) {
 }
 function randi(min, max) { // inclusive for both
 	return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
+function randf(min, max) {
+	return Math.random() * (max - min) + min;
 }
 function removeFromArray(needle, array) {
 	return array.filter(function(item) {
