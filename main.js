@@ -85,7 +85,8 @@ function createBodies(num) {
 			new vec2(0, 0),
 			400000000, 50,
 			[0, 0, 0],
-			false
+			false, 
+			new vec2(0, 0)
 		)
 	)
 }
