@@ -1,8 +1,7 @@
 class Body {
-	static __type__ = this.name;
 	constructor(pos, vel, mass, radius, color, moveable, oldpos) {
-		this.__type__ = Body.__type__;
-		
+		this.__type__ = Body.name;
+
 		this.pos = pos
 		this.velocity = vel
 		this.mass = mass
@@ -51,3 +50,4 @@ class Body {
 		return (G * this.mass) / Math.pow(this.r, 2);
 	}
 }
+Body.__type__ = Body.name;

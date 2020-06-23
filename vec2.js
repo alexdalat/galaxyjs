@@ -1,7 +1,7 @@
 class vec2 {
-	static __type__ = this.name;
 	constructor(x, y) {
-		this.__type__ = vec2.__type__;
+		this.__type__ = vec2.name;
+
 		if(x===undefined)x=0
 		if(y===undefined)y=0
 		this.x = x;
@@ -41,3 +41,4 @@ class vec2 {
 		return new vec2(v1.x - v2.x, v1.y - v2.y)
 	}
 }
+vec2.__type__ = vec2.name;
