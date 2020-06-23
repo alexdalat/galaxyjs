@@ -1,5 +1,5 @@
 # GravityJS
-Simulation of galactic planetoids orbiting a supermassive blackhole.
+Simulation of galactic planetoids orbiting a supermassive blackhole.<br>
 Because Javascript and CPUs are slow, it can only run smoothly in real-time with ~1,500 particles (with worker threading).
 
 800k particles
