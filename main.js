@@ -77,7 +77,7 @@ function createBodies(num) {
 	if(config.spirals) {
 		let wave_count = 4
 		let wavetotal = total*(0.3) / wave_count
-		let waveJitter = 10 // rand(-jtr, jtr)
+		let waveJitter = 25 // rand(-jtr, jtr)
 		for(let s = 0; s < wave_count; s++) {
 			for(let p = 0; p < wavetotal; p++) {
 				let jitter = radians(randf(-waveJitter, waveJitter))
